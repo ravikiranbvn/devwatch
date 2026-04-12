@@ -1,2 +1,75 @@
+<p align="left">
+  <img src="assets/devwatch.png" width="160"/>
+</p>
+
 # devwatch
-A Linux device observability tool for mapping processes, devices, and kernel metadata.
+
+**devwatch** is a lightweight Linux device observability tool written in Rust.
+
+It maps:
+
+- Processes → opened file descriptors
+- File descriptors → `/dev` device nodes
+- Device nodes → `/sys` (kernel metadata)
+
+This helps you understand how software interacts with hardware and kernel subsystems in real time.
+
+---
+
+## ✨ Features
+
+- Process → device mapping via `/proc`
+- `/dev` → `/sys/class` resolution
+- Subsystem detection (drm, input, sound, etc.)
+- Driver detection (with parent traversal)
+- Device classification:
+  - `physical`
+  - `virtual`
+  - `pseudo`
+- Works across:
+  - x86 Linux
+  - Raspberry Pi
+  - Embedded Linux platforms (MPSoC, i.MX, etc.)
+
+---
+
+## 🖥️ Example Output
+
+```bash
+DEVICE                   KIND       SUBSYSTEM    DRIVER           DEVNUM         SYSFS                                    PROCESSES
+------------------------------------------------------------------------------------------------------------------------------------------------------
+/dev/dri/card1           physical   drm          i915             226:1          /sys/class/drm/card1                     chrome(3638), code(4909)
+/dev/input/event0        physical   input        unknown          13:64          /sys/class/input/event0                  wayfire(966)
+/dev/fuse                virtual    misc         unknown          10:229         /sys/class/misc/fuse                     gvfsd-fuse(1285)
+```
+
+## 🏗️ Project Structure
+
+```bash
+src/
+├── lib.rs               # Library entry
+├── model.rs             # Shared data structures
+├── procfs_layer.rs      # Process + FD discovery
+├── dev_layer.rs         # /dev extraction & grouping
+├── sysfs_layer.rs       # /dev -> /sys resolution
+└── bin/
+    └── devwatch.rs      # CLI entry point
+```
+
+
+---
+
+## 🔧 Build
+
+### Native build (x86_64)
+
+```bash
+cargo build --release
+cargo run --bin devwatch
+```
+
+### Cross compile (ARM64)
+
+```bash
+cargo build --release --target aarch64-unknown-linux-gnu --bin devwatch
+```
