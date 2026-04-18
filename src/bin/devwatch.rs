@@ -93,8 +93,8 @@ fn print_table(records: &[DeviceRecord]) {
 }
 
 fn print_json(records: &[DeviceRecord]) -> io::Result<()> {
-    let json = serde_json::to_string_pretty(records)
-        .map_err(|e| io::Error::other(e.to_string()))?;
+    let json =
+        serde_json::to_string_pretty(records).map_err(|e| io::Error::other(e.to_string()))?;
     println!("{json}");
     Ok(())
 }
