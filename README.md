@@ -60,6 +60,16 @@ DEVICE                   KIND       SUBSYSTEM    DRIVER           DEVNUM        
 /dev/fuse                virtual    misc         unknown          10:229         /sys/class/misc/fuse                     gvfsd-fuse(1285)
 ```
 
+## 📸 Screenshots
+
+### CLI Output
+
+![CLI Output](assets/screenshots/devwatch_sub_drm.png)
+
+### JSON Output
+
+![JSON Output](assets/screenshots/devwatch_json.png)
+
 ## 🏗️ Project Structure
 
 ```bash

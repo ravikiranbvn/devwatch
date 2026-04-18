@@ -25,6 +25,14 @@ struct Cli {
     /// Filter by driver
     #[arg(long)]
     driver: Option<String>,
+
+    /// Do not print table headers
+    #[arg(long)]
+    no_headers: bool,
+
+    /// Print only record count
+    #[arg(long)]
+    count_only: bool,
 }
 
 fn matches_filter(record: &DeviceRecord, cli: &Cli) -> bool {
@@ -99,17 +107,19 @@ fn print_no_results() {
     println!("No matching device records found.");
 }
 
-fn print_table(records: &[DeviceRecord]) {
+fn print_table(records: &[DeviceRecord], no_headers: bool) {
     if records.is_empty() {
         print_no_results();
         return;
     }
 
-    println!(
-        "{:<24} {:<10} {:<12} {:<16} {:<14} {:<40} PROCESSES",
-        "DEVICE", "KIND", "SUBSYSTEM", "DRIVER", "DEVNUM", "SYSFS"
-    );
-    println!("{}", "-".repeat(150));
+    if !no_headers {
+        println!(
+            "{:<24} {:<10} {:<12} {:<16} {:<14} {:<40} PROCESSES",
+            "DEVICE", "KIND", "SUBSYSTEM", "DRIVER", "DEVNUM", "SYSFS"
+        );
+        println!("{}", "-".repeat(150));
+    }
 
     for record in records {
         let kind = &record.sysfs.kind;
@@ -137,8 +147,10 @@ fn print_table(records: &[DeviceRecord]) {
         );
     }
 
-    println!();
-    println!("{} record(s)", records.len());
+    if !no_headers {
+        println!();
+        println!("{} record(s)", records.len());
+    }
 }
 
 fn print_json(records: &[DeviceRecord]) -> io::Result<()> {
@@ -158,10 +170,16 @@ fn main() -> io::Result<()> {
     records.retain(|record| matches_filter(record, &cli));
     records.sort_by(|a, b| a.usage.device_path.cmp(&b.usage.device_path));
 
+    // Count-only mode (highest priority)
+    if cli.count_only {
+        println!("{}", records.len());
+        return Ok(());
+    }
+
     if cli.json {
         print_json(&records)?;
     } else {
-        print_table(&records);
+        print_table(&records, cli.no_headers);
     }
 
     Ok(())
