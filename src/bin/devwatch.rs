@@ -52,7 +52,59 @@ fn matches_filter(record: &DeviceRecord, cli: &Cli) -> bool {
     true
 }
 
+fn format_process_list(record: &DeviceRecord, max_width: usize) -> String {
+    let full = record
+        .usage
+        .processes
+        .iter()
+        .map(|p| format!("{}({})", p.name, p.pid))
+        .collect::<Vec<_>>()
+        .join(", ");
+
+    if full.len() <= max_width {
+        return full;
+    }
+
+    if max_width <= 3 {
+        return "...".to_string();
+    }
+
+    let mut truncated = String::new();
+
+    for part in full.split(", ") {
+        let candidate = if truncated.is_empty() {
+            part.to_string()
+        } else {
+            format!("{truncated}, {part}")
+        };
+
+        if candidate.len() + 3 > max_width {
+            break;
+        }
+
+        truncated = candidate;
+    }
+
+    if truncated.is_empty() {
+        let mut s = full.chars().take(max_width - 3).collect::<String>();
+        s.push_str("...");
+        return s;
+    }
+
+    truncated.push_str("...");
+    truncated
+}
+
+fn print_no_results() {
+    println!("No matching device records found.");
+}
+
 fn print_table(records: &[DeviceRecord]) {
+    if records.is_empty() {
+        print_no_results();
+        return;
+    }
+
     println!(
         "{:<24} {:<10} {:<12} {:<16} {:<14} {:<40} PROCESSES",
         "DEVICE", "KIND", "SUBSYSTEM", "DRIVER", "DEVNUM", "SYSFS"
@@ -71,13 +123,7 @@ fn print_table(records: &[DeviceRecord]) {
             .map(|p| p.display().to_string())
             .unwrap_or_else(|| "N/A".to_string());
 
-        let proc_list = record
-            .usage
-            .processes
-            .iter()
-            .map(|p| format!("{}({})", p.name, p.pid))
-            .collect::<Vec<_>>()
-            .join(", ");
+        let proc_list = format_process_list(record, 48);
 
         println!(
             "{:<24} {:<10} {:<12} {:<16} {:<14} {:<40} {}",
@@ -90,6 +136,9 @@ fn print_table(records: &[DeviceRecord]) {
             proc_list
         );
     }
+
+    println!();
+    println!("{} record(s)", records.len());
 }
 
 fn print_json(records: &[DeviceRecord]) -> io::Result<()> {
