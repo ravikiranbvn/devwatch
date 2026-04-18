@@ -29,7 +29,9 @@ It bridges:
 - `/dev` → device nodes  
 - `/sys` → kernel metadata (drivers, subsystems)  
 
-So you can clearly understand how software interacts with hardware and kernel subsystems in real time.
+- By default, `devwatch` shows devices currently opened by processes.
+- Use `--all-devices` to inspect all discoverable `/dev` device nodes.
+- So you can clearly understand how software interacts with hardware and kernel subsystems in real time.
 
 ---
 
@@ -64,7 +66,7 @@ DEVICE                   KIND       SUBSYSTEM    DRIVER           DEVNUM        
 
 ### CLI Output
 
-![CLI Output](assets/screenshots/devwatch_sub_drm.png)
+![CLI Output](assets/screenshots/devwatch_drm.png)
 
 ### JSON Output
 
@@ -109,6 +111,10 @@ devwatch --json
 devwatch --device video
 devwatch --subsystem drm
 devwatch --driver i915
+devwatch --no-headers
+devwatch --count-only
+devwatch --all-devices
+devwatch --all-devices --device video
 ```
 
 ---
