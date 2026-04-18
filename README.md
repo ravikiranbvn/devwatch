@@ -6,27 +6,44 @@
 
 **devwatch** is a lightweight Linux device observability tool written in Rust.
 
-It maps:
+**Think: `lsof` + `htop`, but for Linux devices**
 
-- Processes → opened file descriptors
-- File descriptors → `/dev` device nodes
-- Device nodes → `/sys` (kernel metadata)
+## 🧠 Why devwatch?
 
-This helps you understand how software interacts with hardware and kernel subsystems in real time.
+Linux provides excellent tools for observing systems:
+
+- Processes → `top`, `htop`  
+- Files → `lsof`  
+
+But there is no simple way to answer:
+
+- Which process is using my GPU?
+- Who opened `/dev/video0`?
+- Which application is interacting with hardware devices?
+
+**devwatch fills this gap.**
+
+It bridges:
+
+- `/proc` → processes  
+- `/dev` → device nodes  
+- `/sys` → kernel metadata (drivers, subsystems)  
+
+So you can clearly understand how software interacts with hardware and kernel subsystems in real time.
 
 ---
 
 ## ✨ Features
 
 - Process → device mapping via `/proc`
-- `/dev` → `/sys/class` resolution
-- Subsystem detection (drm, input, sound, etc.)
-- Driver detection (with parent traversal)
+- `/dev` → `/sys` resolution using device numbers
+- Subsystem detection (e.g., `drm`, `input`, `sound`)
+- Driver detection with parent traversal
 - Device classification:
   - `physical`
   - `virtual`
   - `pseudo`
-- Works across:
+- Cross-platform support:
   - x86 Linux
   - Raspberry Pi
   - Embedded Linux platforms (MPSoC, i.MX, etc.)
@@ -73,3 +90,13 @@ cargo run --bin devwatch
 ```bash
 cargo build --release --target aarch64-unknown-linux-gnu --bin devwatch
 ```
+
+---
+
+🎯 Use Cases
+- Debugging device access conflicts (e.g., camera, GPU)
+- Understanding hardware usage by applications
+- Inspecting device behavior on embedded Linux systems
+- Exploring Linux internals (/proc, /dev, /sys) in a unified view
+
+---
