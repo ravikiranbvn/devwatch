@@ -1,19 +1,21 @@
 use std::collections::BTreeSet;
 use std::path::PathBuf;
 
-#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
+use serde::Serialize;
+
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Serialize)]
 pub struct ProcessRef {
     pub pid: i32,
     pub name: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct DeviceUsage {
     pub device_path: PathBuf,
     pub processes: BTreeSet<ProcessRef>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct SysfsInfo {
     pub sysfs_path: Option<PathBuf>,
     pub subsystem: Option<String>,
@@ -22,7 +24,7 @@ pub struct SysfsInfo {
     pub kind: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct DeviceRecord {
     pub usage: DeviceUsage,
     pub sysfs: SysfsInfo,

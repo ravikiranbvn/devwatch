@@ -91,6 +91,16 @@ cargo run --bin devwatch
 cargo build --release --target aarch64-unknown-linux-gnu --bin devwatch
 ```
 
+## Usage
+
+```bash
+devwatch
+devwatch --json
+devwatch --device video
+devwatch --subsystem drm
+devwatch --driver i915
+```
+
 ---
 
 🎯 Use Cases

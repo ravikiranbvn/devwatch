@@ -1,11 +1,11 @@
 use std::collections::{BTreeMap, BTreeSet};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use procfs::process::{FDTarget, Process};
 
 use crate::model::{DeviceUsage, ProcessRef};
 
-fn normalize_dev_target(path: &PathBuf) -> Option<PathBuf> {
+fn normalize_dev_target(path: &Path) -> Option<PathBuf> {
     let target = path.to_string_lossy();
 
     if !target.starts_with("/dev/") {
@@ -20,7 +20,7 @@ fn normalize_dev_target(path: &PathBuf) -> Option<PathBuf> {
         return None;
     }
 
-    Some(path.clone())
+    Some(path.to_path_buf())
 }
 
 /// Build a grouped map: /dev node -> set of processes using it.
@@ -67,4 +67,34 @@ pub fn collect_device_usage(processes: &[ProcessRef]) -> Vec<DeviceUsage> {
             processes,
         })
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::normalize_dev_target;
+    use std::path::PathBuf;
+
+    #[test]
+    fn accepts_regular_dev_nodes() {
+        let path = PathBuf::from("/dev/video0");
+        assert_eq!(normalize_dev_target(&path), Some(path));
+    }
+
+    #[test]
+    fn rejects_non_dev_paths() {
+        let path = PathBuf::from("/tmp/foo");
+        assert_eq!(normalize_dev_target(&path), None);
+    }
+
+    #[test]
+    fn rejects_dev_null() {
+        let path = PathBuf::from("/dev/null");
+        assert_eq!(normalize_dev_target(&path), None);
+    }
+
+    #[test]
+    fn rejects_shm_paths() {
+        let path = PathBuf::from("/dev/shm/test");
+        assert_eq!(normalize_dev_target(&path), None);
+    }
 }

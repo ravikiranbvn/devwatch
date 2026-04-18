@@ -176,3 +176,33 @@ pub fn enrich_devices_with_sysfs(usages: &[DeviceUsage]) -> Vec<DeviceRecord> {
         })
         .collect()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::classify_kind;
+    use std::path::Path;
+
+    #[test]
+    fn classifies_pts_as_pseudo() {
+        let kind = classify_kind(Path::new("/dev/pts/0"), None, None);
+        assert_eq!(kind, "pseudo");
+    }
+
+    #[test]
+    fn classifies_fuse_as_virtual() {
+        let kind = classify_kind(Path::new("/dev/fuse"), None, None);
+        assert_eq!(kind, "virtual");
+    }
+
+    #[test]
+    fn classifies_misc_without_sysfs_as_virtual() {
+        let kind = classify_kind(Path::new("/dev/rfkill"), None, Some("misc"));
+        assert_eq!(kind, "virtual");
+    }
+
+    #[test]
+    fn classifies_unknown_when_no_signal_matches() {
+        let kind = classify_kind(Path::new("/dev/custom0"), None, None);
+        assert_eq!(kind, "unknown");
+    }
+}
