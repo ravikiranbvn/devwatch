@@ -98,6 +98,20 @@ fn truncate_middle(s: &str, max_width: usize) -> String {
     format!("{start}...{end}")
 }
 
+fn format_memory_kb(memory_kb: Option<u64>) -> String {
+    let Some(kb) = memory_kb else {
+        return "?".to_string();
+    };
+
+    if kb >= 1024 * 1024 {
+        format!("{:.1} GB", kb as f64 / (1024.0 * 1024.0))
+    } else if kb >= 1024 {
+        format!("{:.1} MB", kb as f64 / 1024.0)
+    } else {
+        format!("{kb} kB")
+    }
+}
+
 fn print_record_rows(record: &DeviceRecord) {
     let kind = &record.sysfs.kind;
     let driver = record.sysfs.driver.as_deref().unwrap_or("unknown");
@@ -111,7 +125,7 @@ fn print_record_rows(record: &DeviceRecord) {
 
     if record.usage.processes.is_empty() {
         println!(
-            "{:<24} {:<28} {:<10} {:<20} {:<14} {}",
+            "{:<24} {:<42} {:<10} {:<20} {:<14} {}",
             record.usage.device_path.display(),
             "-",
             kind,
@@ -123,11 +137,16 @@ fn print_record_rows(record: &DeviceRecord) {
     }
 
     for (idx, process) in record.usage.processes.iter().enumerate() {
-        let proc_str = format!("{}({})", process.name, process.pid);
+        let proc_str = format!(
+            "{}({}) [{}]",
+            process.name,
+            process.pid,
+            format_memory_kb(process.memory_kb)
+        );
 
         if idx == 0 {
             println!(
-                "{:<24} {:<28} {:<10} {:<20} {:<14} {}",
+                "{:<24} {:<42} {:<10} {:<20} {:<14} {}",
                 record.usage.device_path.display(),
                 proc_str,
                 kind,
@@ -168,7 +187,7 @@ fn print_table(records: &[DeviceRecord], no_headers: bool) {
 
         if !no_headers {
             println!(
-                "{:<24} {:<28} {:<10} {:<20} {:<14} SYSFS",
+                "{:<24} {:<42} {:<10} {:<20} {:<14} SYSFS",
                 "DEVICE", "PROCESSES", "KIND", "DRIVER", "DEVNUM"
             );
             println!("{}", "-".repeat(150));
