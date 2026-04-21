@@ -130,6 +130,7 @@ cd devwatch-linux-x86_64
 
 ## Usage
 
+```bash
 # Default view (grouped by subsystem)
 devwatch
 
@@ -150,6 +151,7 @@ devwatch --json
 
 # Count only
 devwatch --count-only
+```
 
 ---
 
