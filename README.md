@@ -55,11 +55,14 @@ It bridges:
 ## 🖥️ Example Output
 
 ```bash
-DEVICE                   KIND       SUBSYSTEM    DRIVER           DEVNUM         SYSFS                                    PROCESSES
-------------------------------------------------------------------------------------------------------------------------------------------------------
-/dev/dri/card1           physical   drm          i915             226:1          /sys/class/drm/card1                     chrome(3638), code(4909)
-/dev/input/event0        physical   input        unknown          13:64          /sys/class/input/event0                  wayfire(966)
-/dev/fuse                virtual    misc         unknown          10:229         /sys/class/misc/fuse                     gvfsd-fuse(1285)
+== drm (3) ==
+DEVICE                   PROCESSES                    KIND       DRIVER           DEVNUM         SYSFS
+------------------------------------------------------------------------------------------------------------------------
+/dev/dri/card1           chrome(3597) [468.2 MB]      physical   i915             226:1          /sys/class/drm/card1
+                         code(6088) [241.7 MB]
+
+/dev/dri/renderD128      chrome(3597) [468.2 MB]      physical   i915             226:128        /sys/class/drm/renderD128
+                         code(6088) [241.7 MB]
 ```
 
 ## 📸 Screenshots
@@ -103,19 +106,50 @@ cargo run --bin devwatch
 cargo build --release --target aarch64-unknown-linux-gnu --bin devwatch
 ```
 
-## Usage
+## 🚀 Install
+
+### From source
 
 ```bash
-devwatch
-devwatch --json
-devwatch --device video
-devwatch --subsystem drm
-devwatch --driver i915
-devwatch --no-headers
-devwatch --count-only
-devwatch --all-devices
-devwatch --all-devices --device video
+git clone https://github.com/ravikiranbvn/devwatch
+cd devwatch
+cargo build --release
+./target/release/devwatch
 ```
+
+### Prebuilt binaries
+
+Download from GitHub Releases:
+
+```bash
+https://github.com/ravikiranbvn/devwatch/releases
+tar -xzf devwatch-linux-x86_64.tar.gz
+cd devwatch-linux-x86_64
+./devwatch
+```
+
+## Usage
+
+# Default view (grouped by subsystem)
+devwatch
+
+# Filter by subsystem
+devwatch --subsystem drm
+
+# Filter by driver
+devwatch --driver i915
+
+# Filter by device name
+devwatch --device video
+
+# Show all devices (not just active ones)
+devwatch --all-devices
+
+# JSON output
+devwatch --json
+
+# Count only
+devwatch --count-only
 
 ---
 
@@ -126,3 +160,10 @@ devwatch --all-devices --device video
 - Exploring Linux internals (/proc, /dev, /sys) in a unified view
 
 ---
+
+🤝 Contributing
+
+Feedback, issues, and pull requests are welcome.
+
+Open an issue for bugs or feature requests
+Submit a PR for improvements

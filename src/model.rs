@@ -7,6 +7,7 @@ use serde::Serialize;
 pub struct ProcessRef {
     pub pid: i32,
     pub name: String,
+    pub memory_kb: Option<u64>,
 }
 
 #[derive(Debug, Clone, Serialize)]
